@@ -1,26 +1,44 @@
 <template>
-  <div class="item-view" v-if="item">
+  <div
+    v-if="item"
+    class="item-view"
+  >
     <template v-if="item">
       <div class="item-view-header">
-        <a :href="item.url" target="_blank">
+        <a
+          :href="item.url"
+          target="_blank"
+        >
           <h1>{{ item.title }}</h1>
         </a>
-        <span v-if="item.url" class="host">
+        <span
+          v-if="item.url"
+          class="host"
+        >
           ({{ item.url | host }})
         </span>
         <p class="meta">
           {{ item.score }} points
-          | by <router-link :to="'/user/' + item.by">{{ item.by }}</router-link>
+          | by <router-link :to="'/user/' + item.by">
+            {{ item.by }}
+          </router-link>
           {{ item.time | timeAgo }} ago
         </p>
       </div>
       <div class="item-view-comments">
         <p class="item-view-comments-header">
           {{ item.kids ? item.descendants + ' comments' : 'No comments yet.' }}
-          <spinner :show="loading"></spinner>
+          <spinner :show="loading" />
         </p>
-        <ul v-if="!loading" class="comment-children">
-          <comment v-for="id in item.kids" :key="id" :id="id"></comment>
+        <ul
+          v-if="!loading"
+          class="comment-children"
+        >
+          <comment
+            v-for="id in item.kids"
+            :id="id"
+            :key="id"
+          />
         </ul>
       </div>
     </template>
@@ -32,7 +50,7 @@ import Spinner from '../components/Spinner.vue'
 import Comment from '../components/Comment.vue'
 
 export default {
-  name: 'item-view',
+  name: 'ItemView',
   components: { Spinner, Comment },
 
   data: () => ({
@@ -43,6 +61,11 @@ export default {
     item () {
       return this.$store.state.items[this.$route.params.id]
     }
+  },
+
+  // refetch comments if item changed
+  watch: {
+    item: 'fetchComments'
   },
 
   // We only fetch the item itself before entering the view, because
@@ -59,11 +82,6 @@ export default {
   // Fetch comments when mounted on the client
   beforeMount () {
     this.fetchComments()
-  },
-
-  // refetch comments if item changed
-  watch: {
-    item: 'fetchComments'
   },
 
   methods: {
